@@ -13,10 +13,6 @@ function ArticlesList() {
   const [isLoading, setIsLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0)
 
-  const orderOptions = [
-    {value: "desc", label: "Descending"},
-    {value: "asc", label: "Ascending"}
-  ]
 
   useEffect(() => {
     setIsLoading(true);
