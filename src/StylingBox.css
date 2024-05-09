@@ -39,3 +39,16 @@
     max-width: 2%;
     max-height: 2%;
 }
+
+.box .increase{
+    grid-area: c;
+    padding: 2px;
+}
+
+.box .decrease{
+    grid-area: b;
+}
+
+.comment-info{
+    grid-area: a;
+}

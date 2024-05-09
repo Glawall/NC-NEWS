@@ -9,7 +9,8 @@
     'list image'
     'list image'
     'votes votes'
-    'increase decrease';
+    'increase decrease'
+    'comments comments';
     background-color: #ff6f69;
     width: 94.4%;
     border: solid #b2b2b2;
@@ -57,4 +58,14 @@ img{
 .decrease{
     grid-area: decrease;
     padding: 2px
+}
+
+.comments{
+    grid-area: comments;
+}
+.comment-hidden{
+    display: none
+}
+
+.comment{
 }
