@@ -39,10 +39,13 @@ function CommentCard({ comment }) {
 
   return (
     <>
+    <span class = "box">
       <div key={comment.comment_id}>
+        <span class = "comment-info">
         <h2>{comment.author}</h2>
         <p>{comment.body}</p>
         <p>Votes: {comment.votes + commentCount}</p>
+        </span>
       </div>
       <span className="increase">
         <button
@@ -62,6 +65,7 @@ function CommentCard({ comment }) {
           {" "}
           - Decrease Vote
         </button>{" "}
+      </span>
       </span>
     </>
   );

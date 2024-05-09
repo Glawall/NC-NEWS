@@ -167,6 +167,11 @@ function Article() {
         >
           {viewCommentButton}
         </button>
+        <button
+          className={isVisible ? "comment-hidden" : "comment"}
+        >
+          Post New Comment
+        </button>
         <ul className={isVisible ? "comment-hidden" : "comment"}>
           {commentsArr.map((comment) => {
             return (
