@@ -73,6 +73,7 @@ function ArticlesList() {
       <ul>
         {articlesList.map((article) => {
           return (
+
             <StylingBox key={article.article_id}>
               <ArticleCard article={article} />
             </StylingBox>
