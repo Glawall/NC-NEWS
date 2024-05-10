@@ -4,121 +4,80 @@ import axios from "axios";
 import "../Article.css";
 import CommentCard from "./CommentCard";
 import StylingBox from "./StylingBox";
+import PostCommentForm from "./PostCommentForm";
 
-function Article() {
+function Article({ usernameG, isError, setIsError}) {
   const [article, setArticle] = useState({});
   const { article_id } = useParams();
-  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [voteCount, setVoteCount] = useState(0);
   const [commentsArr, setCommentsArr] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [numberOfItemsPerPage, setNumberOfItemsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState();
   const [isVisible, setIsVisible] = useState(true);
-  const [viewCommentButton, setViewCommentButton] = useState("View Comments");
+  const [newComment, setNewComment] = useState({});
+  const [commentCount, setCommentCount] = useState(0)
+  const [articleDate, setArticleDate] = useState("")
 
-  const fetchArticle = useEffect(
-    (voteCount) => {
-      setIsLoading(true);
-      axios
-        .get(
-          `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}`
-        )
-        .then((response) => {
-          return response.data;
-        })
-        .then((data) => {
-          setIsLoading(false);
-          setArticle(data.article);
-        })
-        .catch((err) => {
-          setIsError(true);
-        });
-    },
-    [article_id]
-  );
 
-  const fetchComments = useEffect(() => {
+useEffect(() => {
     setIsLoading(true);
     axios
       .get(
-        `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}/comments?p=${pageNumber}&&limit=${numberOfItemsPerPage}`
+        `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}`
       )
       .then((response) => {
-        return response.data;
-      })
-      .then((data) => {
         setIsLoading(false);
-        setCommentsArr(data);
-        setTotalCount(data.length);
+        setArticle(response.data.article);
+        setCommentCount(response.data.article.comment_count)
+        setArticleDate(response.data.article.created_at.substring(0, 10))
       })
       .catch((err) => {
         setIsError(true);
       });
   }, [article_id]);
 
+useEffect(() => {
+    setIsLoading(true);
+    axios
+      .get(
+        `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}/comments?p=${pageNumber}&&limit=${numberOfItemsPerPage}`
+      )
+      .then((response) => {
+        setIsLoading(false);
+        setCommentsArr(response.data);
+      })
+      .catch((err) => {
+        setIsError(true);
+      });
+  }, [article_id, newComment]);
+
   if (isError) {
     return <h2>An error has occured</h2>;
   }
 
-  const voteCounts = useEffect(() => {
-    setVoteCount(voteCount);
-  }, [voteCount]);
 
-  const commentsButton = useEffect(() => {
-    setViewCommentButton(viewCommentButton);
-  }, [viewCommentButton]);
-
-  const isItVisible = useEffect(() => {
-    setIsVisible(isVisible);
-  }, [isVisible]);
-
-  Promise.all([
-    fetchArticle,
-    fetchComments,
-    voteCounts,
-    isItVisible,
-    commentsButton,
-  ]);
-
-  function handleIncreaseVotes(article_id, vote) {
+  function handleVotesChange(article_id, vote) {
     axios
       .patch(
         `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}`,
-        { inc_votes: 1 }
+        { inc_votes: vote }
       )
       .catch((err) => {
-        setVoteCount(currentVote);
+        setVoteCount((currentVoteChange) => currentVoteChange - vote);
         return <p>Vote did not go through</p>;
       });
     setVoteCount((currVoteChange) => currVoteChange + vote);
   }
 
-  function handleDecreaseVotes(article_id, vote) {
-    setVoteCount((currVoteChange) => currVoteChange + vote);
-    axios
-      .patch(
-        `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}`,
-        { inc_votes: -1 }
-      )
-      .catch((err) => {
-        setVoteCount(currentVote);
-        return <p>Vote did not go through</p>;
-      });
-  }
-
-  function onClickReveal(setIsVisible, setViewCommentButton) {
-    if (viewCommentButton === "View Comments") {
-      setViewCommentButton("Hide Comments");
+  function onClickReveal(e) {
+    if (e.target.innerHTML === "View Comments") {
       setIsVisible(false);
+      e.target.innerHTML = "Hide Comments";
+    } else {
+      setIsVisible(true);
+      e.target.innerHTML = "View Comments";
     }
-    else {
-    setIsVisible(true);
-    setViewCommentButton("View Comments");
-
-    }
-
   }
 
   return isLoading ? (
@@ -129,7 +88,7 @@ function Article() {
         <h3 className="title">{article.title}</h3>
         <h4 className="author">Author: {article.author}</h4>
         <p className="body">{article.body}</p>
-        <p className="date">{article.created_at.substring(0, 10)}</p>
+        <p className="date">{articleDate}</p>
       </span>
       <span className="article-image">
         {article.article_img_url ? (
@@ -144,7 +103,7 @@ function Article() {
       <span className="increase">
         <button
           disabled={voteCount === 1}
-          onClick={() => handleIncreaseVotes(article_id, 1)}
+          onClick={() => handleVotesChange(article_id, 1)}
         >
           {" "}
           + Increase Vote
@@ -154,24 +113,20 @@ function Article() {
         {" "}
         <button
           disabled={voteCount === -1}
-          onClick={() => handleDecreaseVotes(article_id, -1)}
+          onClick={() => handleVotesChange(article_id, -1)}
         >
           {" "}
           - Decrease Vote
         </button>{" "}
       </span>
       <span className="comments">
-        <button
-          value={viewCommentButton}
-          onClick={() => onClickReveal(setIsVisible, setViewCommentButton)}
-        >
-          {viewCommentButton}
-        </button>
-        <button
-          className={isVisible ? "comment-hidden" : "comment"}
-        >
-          Post New Comment
-        </button>
+        <button onClick={(event) => onClickReveal(event)}>View Comments</button>
+        <PostCommentForm
+          setCommentsArr={setCommentsArr}
+          setNewComment={setNewComment}
+          newComment={newComment}
+          usernameG={usernameG}
+        />
         <ul className={isVisible ? "comment-hidden" : "comment"}>
           {commentsArr.map((comment) => {
             return (
@@ -181,16 +136,30 @@ function Article() {
             );
           })}
         </ul>
+        <span className={isVisible ? "comment-hidden" : "comment"}>
         <button
-          className={isVisible ? "comment-hidden" : "comment"}
+          className="previous-page"
           onClick={() => {
-            setPageNumber(1) && setNumberOfItemsPerPage(totalCount);
+            setPageNumber((currentPage) => currentPage - 1);
           }}
-          disabled={numberOfItemsPerPage * pageNumber >= totalCount}
+          disabled={pageNumber === 0}
         >
-          View More Comments
+          Previous page
         </button>
-        <p className={isVisible ? "comment-hidden" : "comment"}>Total Comments = {totalCount}</p>
+        <p>Page: {pageNumber} </p>
+        <button
+          className="next-page"
+          onClick={() => {
+            setPageNumber((currentPage) => currentPage + 1);
+          }}
+          disabled={numberOfItemsPerPage * pageNumber >= commentCount}
+        >
+          Next page
+        </button>
+        <p>
+          Total Comments = {commentCount}
+        </p>
+        </span>
       </span>
     </span>
   );
