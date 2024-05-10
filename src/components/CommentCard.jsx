@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -11,37 +10,25 @@ function CommentCard({ comment }) {
 
   let comment_id = comment.comment_id;
 
-  function handleIncreaseComment(comment_id, vote) {
+  function handleCommentVotes(comment_id, vote) {
     setCommentCount((currCommentChange) => currCommentChange + vote);
 
     axios
       .patch(
         `https://glawall-nc-backend-project.onrender.com/api/comments/${comment_id}`,
-        { inc_votes: 1 }
+        { inc_votes: vote }
       )
       .catch((err) => {
-        setCommentCount(commentCount);
-        return <p>Vote did not go through</p>;
-      });
-  }
-  function handleDecreaseComment(comment_id, vote) {
-    setCommentCount((currCommentChange) => currCommentChange + vote);
-    axios
-      .patch(
-        `https://glawall-nc-backend-project.onrender.com/api/comments/${comment_id}`,
-        { inc_votes: -1 }
-      )
-      .catch((err) => {
-        setCommentCount(commentCount);
+        setCommentCount(commentCount - vote);
         return <p>Vote did not go through</p>;
       });
   }
 
   return (
     <>
-    <span class = "box">
+    <span className = "box">
       <div key={comment.comment_id}>
-        <span class = "comment-info">
+        <span className = "comment-info">
         <h2>{comment.author}</h2>
         <p>{comment.body}</p>
         <p>Votes: {comment.votes + commentCount}</p>
@@ -50,7 +37,7 @@ function CommentCard({ comment }) {
       <span className="increase">
         <button
           disabled={commentCount === 1}
-          onClick={() => handleIncreaseComment(comment_id, 1)}
+          onClick={() => handleCommentVotes(comment_id, 1)}
         >
           {" "}
           + Increase Vote
@@ -60,7 +47,7 @@ function CommentCard({ comment }) {
         {" "}
         <button
           disabled={commentCount === -1}
-          onClick={() => handleDecreaseComment(comment_id, -1)}
+          onClick={() => handleCommentVotes(comment_id, -1)}
         >
           {" "}
           - Decrease Vote

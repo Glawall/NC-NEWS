@@ -69,3 +69,10 @@ img{
 
 .comment{
 }
+
+.post-comment-hidden{
+    display: none
+}
+
+.post-comment{
+}
