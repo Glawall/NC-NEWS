@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-function CommentCard({ comment }) {
-  const [commentCount, setCommentCount] = useState(0);
-
-  useEffect(() => {
-    setCommentCount(commentCount);
-  }, [commentCount]);
+function CommentCard({ comment, usernameG, setCommentCount, commentCount }) {
+  const [commentVotesCount, setCommentVotesCount] = useState(0);
 
   let comment_id = comment.comment_id;
 
   function handleCommentVotes(comment_id, vote) {
-    setCommentCount((currCommentChange) => currCommentChange + vote);
-
+    setCommentVotesCount((currCommentChange) => currCommentChange + vote);
     axios
       .patch(
         `https://glawall-nc-backend-project.onrender.com/api/comments/${comment_id}`,
         { inc_votes: vote }
       )
       .catch((err) => {
-        setCommentCount(commentCount - vote);
+        setCommentVotesCount(commentCount - vote);
         return <p>Vote did not go through</p>;
       });
+  }
+
+  function handleDeleteComment(comment_id, usernameG){
+    console.log(commentCount, "in delete first")
+    console.log(usernameG)
+    if(comment.author === usernameG)
+    axios.delete(`https://glawall-nc-backend-project.onrender.com/api/comments/${comment_id}`)
+    .then(response => {
+        setCommentCount(commentCount -1)
+    alert("Comment Deleted") })
   }
 
   return (
@@ -31,12 +36,12 @@ function CommentCard({ comment }) {
         <span className = "comment-info">
         <h2>{comment.author}</h2>
         <p>{comment.body}</p>
-        <p>Votes: {comment.votes + commentCount}</p>
+        <p>Votes: {comment.votes + commentVotesCount}</p>
         </span>
       </div>
       <span className="increase">
         <button
-          disabled={commentCount === 1}
+          disabled={commentVotesCount === 1}
           onClick={() => handleCommentVotes(comment_id, 1)}
         >
           {" "}
@@ -46,13 +51,14 @@ function CommentCard({ comment }) {
       <span className="decrease">
         {" "}
         <button
-          disabled={commentCount === -1}
+          disabled={commentVotesCount === -1}
           onClick={() => handleCommentVotes(comment_id, -1)}
         >
           {" "}
           - Decrease Vote
         </button>{" "}
-      </span>
+        </span>
+      <button onClick ={() => handleDeleteComment(comment_id, usernameG)}>Delete Comment</button>
       </span>
     </>
   );
