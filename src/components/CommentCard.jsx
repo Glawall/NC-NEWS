@@ -57,7 +57,7 @@ function CommentCard({ comment, usernameG, setCommentCount, commentCount }) {
           {" "}
           - Decrease Vote
         </button>{" "}
-      </span>
+        </span>
       <button onClick ={() => handleDeleteComment(comment_id, usernameG)}>Delete Comment</button>
       </span>
     </>
