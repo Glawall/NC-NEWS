@@ -6,7 +6,7 @@ import CommentCard from "./CommentCard";
 import StylingBox from "./StylingBox";
 import PostCommentForm from "./PostCommentForm";
 
-function Article({ usernameG, isError, setIsError}) {
+function Article({ usernameG, isError, setIsError }) {
   const [article, setArticle] = useState({});
   const { article_id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -16,11 +16,10 @@ function Article({ usernameG, isError, setIsError}) {
   const [numberOfItemsPerPage, setNumberOfItemsPerPage] = useState(10);
   const [isVisible, setIsVisible] = useState(true);
   const [newComment, setNewComment] = useState({});
-  const [commentCount, setCommentCount] = useState(0)
-  const [articleDate, setArticleDate] = useState("")
+  const [commentCount, setCommentCount] = useState(0);
+  const [articleDate, setArticleDate] = useState("");
 
-
-useEffect(() => {
+  useEffect(() => {
     setIsLoading(true);
     axios
       .get(
@@ -29,15 +28,15 @@ useEffect(() => {
       .then((response) => {
         setIsLoading(false);
         setArticle(response.data.article);
-        setCommentCount(response.data.article.comment_count)
-        setArticleDate(response.data.article.created_at.substring(0, 10))
+        setCommentCount(response.data.article.comment_count);
+        setArticleDate(response.data.article.created_at.substring(0, 10));
       })
       .catch((err) => {
         setIsError(true);
       });
   }, [article_id]);
 
-useEffect(() => {
+  useEffect(() => {
     setIsLoading(true);
     axios
       .get(
@@ -50,12 +49,11 @@ useEffect(() => {
       .catch((err) => {
         setIsError(true);
       });
-  }, [article_id, newComment]);
+  }, [article_id, newComment, pageNumber, commentCount]);
 
   if (isError) {
     return <h2>An error has occured</h2>;
   }
-
 
   function handleVotesChange(article_id, vote) {
     axios
@@ -131,18 +129,22 @@ useEffect(() => {
           {commentsArr.map((comment) => {
             return (
               <StylingBox key={comment.comment_id}>
-                <CommentCard comment={comment} />
+                <CommentCard
+                  comment={comment}
+                  usernameG={usernameG}
+                  setCommentCount={setCommentCount}
+                  commentCount={commentCount}
+                />
               </StylingBox>
             );
           })}
         </ul>
-        <span className={isVisible ? "comment-hidden" : "comment"}>
         <button
           className="previous-page"
           onClick={() => {
             setPageNumber((currentPage) => currentPage - 1);
           }}
-          disabled={pageNumber === 0}
+          disabled={pageNumber === 1}
         >
           Previous page
         </button>
@@ -156,10 +158,9 @@ useEffect(() => {
         >
           Next page
         </button>
-        <p>
+        <p className={isVisible ? "comment-hidden" : "comment"}>
           Total Comments = {commentCount}
         </p>
-        </span>
       </span>
     </span>
   );
