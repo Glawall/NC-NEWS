@@ -1,124 +1,121 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useHttpClient } from "../hooks/http-hook";
 import ArticleCard from "./ArticleCard";
-import axios from "axios";
-import StylingBox from "./StylingBox";
+import Pagination from "./Pagination";
 
 function ArticlesList() {
   const [articlesList, setArticlesList] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [numberOfItemsPerPage, setNumberOfItemsPerPage] = useState(10);
-  const [order, setOrder] = useState("desc");
-  const [sortBy, setSortBy] = useState("created_at");
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, sendRequest, error } = useHttpClient();
+  const [sortByOptions, setSortByOptions] = useState({
+    sort_by: "created_at",
+    order: "desc",
+    p: 1,
+    limit: 10,
+  });
+  const [searchParams, setSearchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
 
-  useEffect(() => {
-    setIsLoading(true);
+  const fetchArticles = async () => {
+    try {
+      const { articles } = await sendRequest(
+        `https://glawall-nc-backend-project.onrender.com/api/articles?sort_by=${sortByOptions.sort_by}&order=${sortByOptions.order}&p=${sortByOptions.p}`
+      );
+      if (!isLoading) {
+        setArticlesList(articles);
+        setTotalCount(articles[0].total_count);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    axios
-      .get(
-        `https://glawall-nc-backend-project.onrender.com/api/articles?p=${pageNumber}&limit=${numberOfItemsPerPage}&order=${order}&sort_by=${sortBy}`
-      )
-      .then((response) => {
-        return response.data;
-      })
-      .then((data) => {
-        setArticlesList(data.articles);
-        setIsLoading(false);
-        setTotalCount(data.articles[0].total_count);
-      })
-      .catch((err) => {
-        setIsError(true);
-      });
-  }, [order, numberOfItemsPerPage, sortBy, pageNumber]);
+  useEffect(() => {
+    setSearchParams(sortByOptions);
+    fetchArticles();
+  }, [sortByOptions.setArticlesList]);
 
   function handleOrderChange(event) {
-    setOrder(event.target.value);
-  }
-  function handleLimitChange(event) {
-    setNumberOfItemsPerPage(event.target.value);
+    setSortByOptions((existing) => {
+      return { ...existing, order: event.target.value };
+    });
   }
 
   function handleSortByChange(event) {
-    setSortBy(event.target.value);
-  }
-  if (isError) {
-    return <h2>An error has occured</h2>;
+    setSortByOptions((existing) => {
+      return { ...existing, sort_by: event.target.value };
+    });
   }
 
-  return isLoading ? (
-    <h1>Loading...</h1>
-  ) : (
-    <span className="article-list">
-      <span className="selectors">
-        <select
-          className="order-change"
-          value={order}
-          onChange={handleOrderChange}
-        >
+  function handlePageChange(pageNumber) {
+    setSortByOptions((existing) => {
+      return { ...existing, p: pageNumber };
+    });
+  }
+
+  function handleLimitChange(event) {
+    setSortByOptions((existing) => {
+      return { ...existing, limit: event.target.value };
+    });
+  }
+
+  // function FetchTopics() {
+  //   axios.get(`https://glawall-nc-backend-project.onrender.com/api/topics`)
+  //   .then((response) => {
+  //       setTopicArr(response.data.topics.map((topic) => (topic.slug).charAt(0).toUpperCase() + (topic.slug).slice(1)))
+  //       })
+  //   .catch(err => console.log(err))
+
+  //   }
+
+  // function handleTopicChange(event) {
+  //   setTopic(event.target.value)
+  //   console.log(topic)
+  //   setTopicSelector(`topic=${topic}`)
+  // }
+
+  if (isLoading) {
+    return (
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
+
+  return (
+    <section>
+      <div className="sorting-options">
+        <select value={sortByOptions.order} onChange={handleOrderChange}>
           <option value="desc">Descending</option>
           <option value="asc">Ascending</option>
         </select>
-        <select
-          className="limit-change"
-          value={numberOfItemsPerPage}
-          onChange={handleLimitChange}
-        >
-          <option defaultValue="10">10</option>
-          <option value="20">20</option>
-          <option value={articlesList[0].total_count}>all</option>
-        </select>
-        <select
-          className="sort-by-change"
-          value={sortBy}
-          onChange={handleSortByChange}
-        >
-          <option defaultValue="created_at">Latest</option>
+        <select value={sortByOptions.sort_by} onChange={handleSortByChange}>
+          <option value="created_at">Date</option>
           <option value="title">Title</option>
           <option value="author">Author</option>
-          <option value="topic">Topic</option>
         </select>
-      </span>
-      <span className="article--card-list-wrapper">
+      </div>
+      <div className="article--card-list-wrapper">
         <ul>
           {articlesList.map((article) => {
-            return (
-              <StylingBox key={article.article_id}>
-                <ArticleCard
-                  article={article}
-                  isError={isError}
-                  setIsError={setIsError}
-                  isLoading={isLoading}
-                  setIsLoading={setIsLoading}
-                />
-              </StylingBox>
-            );
+            return <ArticleCard key={article.article_id} article={article} />;
           })}
         </ul>
-      </span>
-      <span className="button-wrapper">
-        <p>Total articles = {articlesList[0].total_count}</p>
-        <button
-          className="previous-page"
-          onClick={() => {
-            setPageNumber((currentPage) => currentPage - 1);
-          }}
-          disabled={pageNumber === 0}
-        >
-          Previous page
-        </button>
-        <button
-          className="next-page"
-          onClick={() => {
-            setPageNumber((currentPage) => currentPage + 1);
-          }}
-          disabled={numberOfItemsPerPage * pageNumber >= totalCount}
-        >
-          Next page
-        </button>
-      </span>
-    </span>
+      </div>
+      <div>
+        <p>Total articles = {totalCount}</p>
+      </div>
+      <Pagination
+        totalCount={totalCount}
+        pageNumber={sortByOptions.p}
+        onPageChange={handlePageChange}
+      />
+      <p>Items per page</p>
+      <select value={sortByOptions.limit} onChange={handleLimitChange}>
+        <option value="10">10</option>
+        <option value="25">25</option>
+      </select>
+    </section>
   );
 }
 export default ArticlesList;
