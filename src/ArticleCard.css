@@ -1,0 +1,29 @@
+.article-list {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr);
+    grid-gap: 20px;
+    max-width: 1500px;
+    min-width: 750px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.article-header {
+    flex: 1;
+    font-size: 1rem;
+    padding-right: 20px;
+    align-items: flex-end;
+
+}
+
+.article-image {
+    width: 200px;
+    height: auto;
+    align-items: center;
+    border: red 5px;
+
+}
