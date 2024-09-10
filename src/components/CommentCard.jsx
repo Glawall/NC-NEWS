@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/auth-context";
 import { useHttpClient } from "../hooks/http-hook";
-import Voting from "./Voting";
+import { formattedDate, formattedTime } from "../util/DateFormatting";
 
 function CommentCard({ comment, setCommentsArr }) {
   const { isLoading, sendRequest, error } = useHttpClient();
@@ -63,6 +63,11 @@ function CommentCard({ comment, setCommentsArr }) {
           />
         </div>
         <p>{comment.body}</p>
+        <br></br>
+        <p>
+          {formattedDate(comment.created_at)} at{" "}
+          {formattedTime(comment.created_at)}
+        </p>
         <br></br>
         <p className="votes">Votes: {comment.votes + commentVotesCount}</p>
         <div className="voting-buttons">

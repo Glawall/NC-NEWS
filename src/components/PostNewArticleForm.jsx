@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { useHttpClient } from "../hooks/http-hook";
 import { AuthContext } from "../context/auth-context";
-import "../Article.css";
+import "../styling/Article.css";
 
 function PostNewArticleForm({ setUserArticles, topicsList, fetchTopics }) {
   const { isLoading, sendRequest, setError } = useHttpClient();
@@ -65,10 +65,6 @@ function PostNewArticleForm({ setUserArticles, topicsList, fetchTopics }) {
         fetchTopics();
         setArticleInputs({ ...articleInputs, topic: slug });
         setAddingNewTopic(false);
-        setTopicInput({
-          slug: "",
-          description: "",
-        });
       }
     } catch (error) {
       console.log("error posting topic", error);

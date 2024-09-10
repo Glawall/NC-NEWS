@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useHttpClient } from "../hooks/http-hook";
 import ArticleCard from "./ArticleCard";
 import Pagination from "./Pagination";
+import Capitalize from "../util/Capitalize";
 
 function ArticlesList() {
   const [articlesList, setArticlesList] = useState([]);
@@ -12,28 +13,48 @@ function ArticlesList() {
     order: "desc",
     p: 1,
     limit: 10,
+    topic: "",
   });
+  const [topicsList, setTopicsList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
+
+  const fetchTopics = async () => {
+    try {
+      const { topics } = await sendRequest(
+        `https://glawall-nc-backend-project.onrender.com/api/topics`
+      );
+      if (!isLoading) {
+        setTopicsList(topics);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTopics();
+  }, []);
 
   const fetchArticles = async () => {
     try {
       const { articles } = await sendRequest(
-        `https://glawall-nc-backend-project.onrender.com/api/articles?sort_by=${sortByOptions.sort_by}&order=${sortByOptions.order}&p=${sortByOptions.p}`
+        `https://glawall-nc-backend-project.onrender.com/api/articles?sort_by=${sortByOptions.sort_by}&order=${sortByOptions.order}&p=${sortByOptions.p}&topic=${sortByOptions.topic}`
       );
       if (!isLoading) {
         setArticlesList(articles);
         setTotalCount(articles[0].total_count);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
     setSearchParams(sortByOptions);
     fetchArticles();
-  }, [sortByOptions.setArticlesList]);
+    fetchTopics();
+  }, [sortByOptions, setArticlesList]);
 
   function handleOrderChange(event) {
     setSortByOptions((existing) => {
@@ -59,20 +80,11 @@ function ArticlesList() {
     });
   }
 
-  // function FetchTopics() {
-  //   axios.get(`https://glawall-nc-backend-project.onrender.com/api/topics`)
-  //   .then((response) => {
-  //       setTopicArr(response.data.topics.map((topic) => (topic.slug).charAt(0).toUpperCase() + (topic.slug).slice(1)))
-  //       })
-  //   .catch(err => console.log(err))
-
-  //   }
-
-  // function handleTopicChange(event) {
-  //   setTopic(event.target.value)
-  //   console.log(topic)
-  //   setTopicSelector(`topic=${topic}`)
-  // }
+  function handleTopicChange(event) {
+    setSortByOptions((existing) => {
+      return { ...existing, topic: event.target.value };
+    });
+  }
 
   if (isLoading) {
     return (
@@ -86,15 +98,25 @@ function ArticlesList() {
     <section>
       <div className="sorting-options">
         <select value={sortByOptions.order} onChange={handleOrderChange}>
-          <option value="desc">Descending</option>
-          <option value="asc">Ascending</option>
+          <option value="desc">Newest</option>
+          <option value="asc">Oldest</option>
         </select>
         <select value={sortByOptions.sort_by} onChange={handleSortByChange}>
           <option value="created_at">Date</option>
           <option value="title">Title</option>
           <option value="author">Author</option>
         </select>
-      </div>
+        <select value={sortByOptions.topic} onChange={handleTopicChange}>
+          <option value="">Choose Topic</option>
+          {topicsList.map((topic) => {
+            return (
+              <option key={topic.slug} value={topic.slug}>
+                {Capitalize(topic.slug)}
+              </option>
+            );
+          })}
+        </select>
+      </div>{" "}
       <div className="article--card-list-wrapper">
         <ul>
           {articlesList.map((article) => {
@@ -102,11 +124,10 @@ function ArticlesList() {
           })}
         </ul>
       </div>
-      <div>
-        <p>Total articles = {totalCount}</p>
-      </div>
+      <div></div>
       <Pagination
         totalCount={totalCount}
+        limit={sortByOptions.limit}
         pageNumber={sortByOptions.p}
         onPageChange={handlePageChange}
       />

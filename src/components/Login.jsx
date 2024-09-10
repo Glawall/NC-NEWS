@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useHttpClient } from "../hooks/http-hook";
 import { AuthContext } from "../context/auth-context";
-import "./Header.css";
+import "../styling/Header.css";
 
 const Login = () => {
   const { isLoggedIn, user, login, logout } = useContext(AuthContext);
@@ -12,24 +11,21 @@ const Login = () => {
   const [currentSelectedUser, setCurrentSelectedUser] = useState("");
   const navigate = useNavigate();
 
-  function fetchUsers() {
-    axios
-      .get(`https://glawall-nc-backend-project.onrender.com/api/users`)
-      .then((response) => {
-        console.log(response.data.users);
-        setUsers(response.data.users);
-        return response.data.users;
-      });
-  }
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { users } = await sendRequest(
+          `https://glawall-nc-backend-project.onrender.com/api/users`
+        );
+        if (!isLoading) {
+          setUsers(users);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
     fetchUsers();
-  }, []);
-
-  const handleClick = () => {
-    setCurrentUser("");
-    navigate("/Homepage");
-  };
+  }, [sendRequest]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

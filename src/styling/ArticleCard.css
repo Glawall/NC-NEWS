@@ -7,7 +7,8 @@
     width: 100%;
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 2px solid #FF4500;
+    margin-bottom: 1px;
     border-radius: 10px;
     background-color: #f9f9f9;
 }
@@ -20,10 +21,13 @@
 
 }
 
-.article-image {
+.article-image-card {
     width: 200px;
-    height: auto;
+    grid-column: 2 / 3;
     align-items: center;
-    border: red 5px;
-
+    margin-top: 20px;
+    display: block;
+    object-fit: cover;
+    border: 2px solid #FF4500;
+    border-radius: 10px;
 }
