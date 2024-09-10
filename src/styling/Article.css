@@ -1,13 +1,13 @@
 .article {
     display: grid;
-    grid-template-columns: minmax(200px, 1fr);
+    grid-template-columns: 1fr;
     grid-gap: 20px;
     max-width: 1500px;
     min-width: 750px;
     width: 100%;
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #c0392b;
+    border: 2px solid #FF4500;
     border-radius: 10px;
     background-color: #f9f9f9;
 }
@@ -17,7 +17,7 @@
     flex-direction: column;
     justify-content: space-between;
     grid-column: 1 / 2;
-    min-width: 350px;
+    min-width: auto;
 }
 
 
@@ -26,24 +26,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 350px;
+    min-width: auto;
     max-width: auto;
     margin-right: 10px;
+    border: 2px solid #FF4500;
+    border-radius: 10px;
+    margin-top: auto;
 }
 
 .article-image img {
     max-width: 100%;
     width: auto;
-    height: auto;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 400px
+    width: 400px;
+    min-width: auto;
+    border: 2px #FF4500 solid;
+
 }
 
 h3 {
     font-size: 2rem;
     color: #333;
     margin-bottom: 10px;
+
 }
 
 h4 {
@@ -227,7 +232,8 @@ button:disabled {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #c0392b;
+    border: 1px solid #f44336;
+    ;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -252,7 +258,8 @@ button:disabled {
 .new-topic-input input {
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #c0392b;
+    border: 3px solid #f44336;
+    ;
     font-size: 1em;
     padding: 10px;
 
@@ -275,6 +282,8 @@ button:disabled {
     align-items: center;
     gap: 10px;
     margin-top: 15px;
+
+
 }
 
 .sorting-options label {
@@ -285,9 +294,19 @@ button:disabled {
 .sorting-options select {
     padding: 8px;
     border-radius: 5px;
-    border: 1px solid #c0392b;
+    border: 2px solid #f44336;
+    ;
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-size: 1rem;
     cursor: pointer;
+    max-width: auto;
+    width: auto
+}
+
+@media screen and (max-width: 768px) {
+    .article {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
 }

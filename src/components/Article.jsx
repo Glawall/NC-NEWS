@@ -1,11 +1,11 @@
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { useHttpClient } from "../hooks/http-hook";
-import "../Article.css";
+import "../styling/Article.css";
 import CommentCard from "./CommentCard";
 import PostCommentForm from "./PostCommentForm";
 import Voting from "./Voting";
-import formattedDate from "../util/DateFormatting";
+import { formattedDate } from "../util/DateFormatting";
 import Pagination from "./Pagination";
 import { AuthContext } from "../context/auth-context";
 
@@ -105,10 +105,10 @@ function Article() {
   return (
     <section className="article">
       <div className="article-info">
-        <h3>{article.title}</h3>
-        <h4>Author: {article.author}</h4>
+        <h3 className="title">{article.title}</h3>
         <p className="body">{article.body}</p>
         <p className="date">{formattedDate(article.created_at)}</p>
+        <p className="date">Written By: {article.author}</p>
       </div>
       <div className="article-image">
         {article.article_img_url ? (

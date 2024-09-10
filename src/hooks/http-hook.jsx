@@ -17,7 +17,6 @@ export const useHttpClient = () => {
           },
           body: body ? JSON.stringify(body) : null,
         });
-        console.log(response);
         if (!response.ok) {
           const errorMessage = `HTTP Error: ${response.status} ${response.statusText}`;
           const error = new Error(errorMessage);

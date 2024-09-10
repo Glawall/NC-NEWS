@@ -9,13 +9,14 @@ const Profile = () => {
     navigate("/");
   };
   return isLoggedIn ? (
-    <span>
+    <div>
       <div className="user-card">
         <h2> Welcome {user.name}!</h2>
         <img src={user.avatar_url} alt="user avatar" />
       </div>
+      <br></br>
       <button onClick={logout}> Logout</button>
-    </span>
+    </div>
   ) : (
     <section>
       <h2> Please log in to continue!</h2>

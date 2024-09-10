@@ -21,7 +21,6 @@ function UserArticles() {
     const profileArticles = [];
 
     try {
-      console.log(user.username);
       const { articles } = await sendRequest(
         `https://glawall-nc-backend-project.onrender.com/api/articles?limit=${sortByOptions.limit}&p=${sortByOptions.p}`
       );
@@ -32,7 +31,6 @@ function UserArticles() {
           }
         });
         setTotalCount(profileArticles.length);
-        console.log(totalCount % 1);
         setUserArticles(profileArticles);
       }
     } catch (err) {
@@ -47,7 +45,6 @@ function UserArticles() {
       );
       if (!isLoading) {
         setTopicsList(response.topics);
-        console.log(response);
       }
     } catch (err) {
       console.log("error fetching topics", err);
