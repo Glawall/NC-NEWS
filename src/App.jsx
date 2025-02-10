@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate, Navigate, Router } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { AuthContext } from "./context/auth-context";
 import { useAuth } from "./hooks/userAuth.jsx";
 import { ErrorBoundary } from "react-error-boundary";
@@ -16,30 +16,28 @@ function App() {
   const navigate = useNavigate();
   const { isLoggedIn, user, login, logout, addVotedArticles } = useAuth();
   return (
-    <Router>
-      <AuthContext.Provider
-        value={{ isLoggedIn, user, login, logout, addVotedArticles }}
-      >
-        <div className="app">
-          <Header />
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onReset={() => {
-              navigate("/");
-            }}
-          >
-            <Routes>
-              <Route path="/" element={<Homepage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/articles" element={<ArticlesList />} />
-              <Route path="/articles/:id" element={<Article />} />
-              <Route path="/my-articles" element={<UserArticles />} />
-              <Route path="/post-article" element={<PostNewArticleForm />} />
-            </Routes>
-          </ErrorBoundary>
-        </div>
-      </AuthContext.Provider>
-    </Router>
+    <AuthContext.Provider
+      value={{ isLoggedIn, user, login, logout, addVotedArticles }}
+    >
+      <div className="app">
+        <Header />
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onReset={() => {
+            navigate("/");
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/articles" element={<ArticlesList />} />
+            <Route path="/articles/:id" element={<Article />} />
+            <Route path="/my-articles" element={<UserArticles />} />
+            <Route path="/post-article" element={<PostNewArticleForm />} />
+          </Routes>
+        </ErrorBoundary>
+      </div>
+    </AuthContext.Provider>
   );
 }
 
