@@ -1,0 +1,25 @@
+.theme-toggle {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+body.dark-theme .theme-toggle {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+body.dark-theme .theme-toggle:hover {
+    background-color: white;
+    color: var(--background-dark);
+}

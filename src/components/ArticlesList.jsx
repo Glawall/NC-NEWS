@@ -4,6 +4,7 @@ import { useHttpClient } from "../hooks/http-hook";
 import ArticleCard from "./ArticleCard";
 import Pagination from "./Pagination";
 import Capitalize from "../util/Capitalize";
+import "../styling/ArticlesList.css";
 
 function ArticlesList() {
   const [articlesList, setArticlesList] = useState([]);
@@ -18,6 +19,9 @@ function ArticlesList() {
   const [topicsList, setTopicsList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [isSliding, setIsSliding] = useState(false);
+  const [slideDirection, setSlideDirection] = useState("");
 
   const fetchTopics = async () => {
     try {
@@ -39,7 +43,7 @@ function ArticlesList() {
   const fetchArticles = async () => {
     try {
       const { articles } = await sendRequest(
-        `https://glawall-nc-backend-project.onrender.com/api/articles?sort_by=${sortByOptions.sort_by}&order=${sortByOptions.order}&p=${sortByOptions.p}&topic=${sortByOptions.topic}`
+        `https://glawall-nc-backend-project.onrender.com/api/articles?sort_by=${sortByOptions.sort_by}&order=${sortByOptions.order}&p=${sortByOptions.p}&topic=${sortByOptions.topic}&limit=${sortByOptions.limit}`
       );
       if (!isLoading) {
         setArticlesList(articles);
@@ -56,23 +60,31 @@ function ArticlesList() {
     fetchTopics();
   }, [sortByOptions, setArticlesList]);
 
-  function handleOrderChange(event) {
-    setSortByOptions((existing) => {
-      return { ...existing, order: event.target.value };
-    });
-  }
-
   function handleSortByChange(event) {
+    const [sort_by, order] = event.target.value.split(",");
     setSortByOptions((existing) => {
-      return { ...existing, sort_by: event.target.value };
+      return { ...existing, sort_by, order: order || "desc" };
     });
   }
 
-  function handlePageChange(pageNumber) {
-    setSortByOptions((existing) => {
-      return { ...existing, p: pageNumber };
-    });
-  }
+  const handlePageChange = (newPage) => {
+    setIsSliding(true);
+    setSlideDirection("out");
+
+    setTimeout(() => {
+      setSortByOptions((existing) => ({
+        ...existing,
+        p: newPage,
+      }));
+
+      setSlideDirection("in");
+
+      setTimeout(() => {
+        setIsSliding(false);
+        setSlideDirection("");
+      }, 300);
+    }, 300);
+  };
 
   function handleLimitChange(event) {
     setSortByOptions((existing) => {
@@ -80,10 +92,12 @@ function ArticlesList() {
     });
   }
 
-  function handleTopicChange(event) {
-    setSortByOptions((existing) => {
-      return { ...existing, topic: event.target.value };
-    });
+  function handleTopicClick(topic) {
+    setSelectedTopic(topic);
+    setSortByOptions((existing) => ({
+      ...existing,
+      topic: topic || "",
+    }));
   }
 
   if (isLoading) {
@@ -95,48 +109,82 @@ function ArticlesList() {
   }
 
   return (
-    <section>
-      <div className="sorting-options">
-        <select value={sortByOptions.order} onChange={handleOrderChange}>
-          <option value="desc">Newest</option>
-          <option value="asc">Oldest</option>
-        </select>
-        <select value={sortByOptions.sort_by} onChange={handleSortByChange}>
-          <option value="created_at">Date</option>
-          <option value="title">Title</option>
-          <option value="author">Author</option>
-        </select>
-        <select value={sortByOptions.topic} onChange={handleTopicChange}>
-          <option value="">Choose Topic</option>
-          {topicsList.map((topic) => {
-            return (
-              <option key={topic.slug} value={topic.slug}>
+    <div className="articles-container">
+      <div className="filters">
+        <div className="topics-filter">
+          <div className="topics-buttons">
+            <button
+              className={`topic-button ${!selectedTopic ? "active" : ""}`}
+              onClick={() => handleTopicClick(null)}
+            >
+              All
+            </button>
+            {topicsList.map((topic) => (
+              <button
+                key={topic.slug}
+                className={`topic-button ${
+                  selectedTopic === topic.slug ? "active" : ""
+                }`}
+                onClick={() => handleTopicClick(topic.slug)}
+              >
                 {Capitalize(topic.slug)}
-              </option>
-            );
-          })}
-        </select>
-      </div>{" "}
-      <div className="article--card-list-wrapper">
-        <ul>
-          {articlesList.map((article) => {
-            return <ArticleCard key={article.article_id} article={article} />;
-          })}
-        </ul>
+              </button>
+            ))}
+          </div>
+          <div className="controls-group">
+            <select
+              value={`${sortByOptions.sort_by}${
+                sortByOptions.order === "asc" ? ",asc" : ""
+              }`}
+              onChange={handleSortByChange}
+              className="sort-select"
+            >
+              <option value="created_at">Most Recent</option>
+              <option value="created_at,asc">Oldest First</option>
+            </select>
+            <div className="items-per-page">
+              <label htmlFor="limit-select" className="items-label">
+                Items per page:
+              </label>
+              <select
+                id="limit-select"
+                value={sortByOptions.limit}
+                onChange={handleLimitChange}
+                className="limit-select"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
-      <div></div>
-      <Pagination
-        totalCount={totalCount}
-        limit={sortByOptions.limit}
-        pageNumber={sortByOptions.p}
-        onPageChange={handlePageChange}
-      />
-      <p>Items per page</p>
-      <select value={sortByOptions.limit} onChange={handleLimitChange}>
-        <option value="10">10</option>
-        <option value="25">25</option>
-      </select>
-    </section>
+
+      <div
+        className={`articles-grid ${
+          isSliding ? `sliding-${slideDirection}` : ""
+        } ${sortByOptions.limit === "25" ? "grid-25" : ""}`}
+      >
+        {isLoading ? (
+          <p className="loading-message">Loading articles...</p>
+        ) : (
+          articlesList.map((article) => (
+            <ArticleCard key={article.article_id} article={article} />
+          ))
+        )}
+      </div>
+
+      <div className="pagination-wrapper">
+        <div className="pagination-controls">
+          <Pagination
+            totalCount={totalCount}
+            limit={sortByOptions.limit}
+            pageNumber={sortByOptions.p}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 export default ArticlesList;

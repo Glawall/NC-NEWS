@@ -1,33 +1,198 @@
-.article-list {
-    display: grid;
-    grid-template-columns: minmax(200px, 1fr);
-    grid-gap: 20px;
-    max-width: 1500px;
-    min-width: 750px;
+.article-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--card-light);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    height: 90%;
+    max-width: 250px;
     width: 100%;
-    margin: 0 auto;
-    padding: 20px;
-    border: 2px solid #FF4500;
-    margin-bottom: 1px;
-    border-radius: 10px;
-    background-color: #f9f9f9;
 }
 
-.article-header {
-    flex: 1;
-    font-size: 1rem;
-    padding-right: 20px;
-    align-items: flex-end;
-
+.article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.article-image-card {
-    width: 200px;
-    grid-column: 2 / 3;
-    align-items: center;
-    margin-top: 20px;
-    display: block;
+.article-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    max-height: 108px;
+}
+
+.article-image img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border: 2px solid #FF4500;
-    border-radius: 10px;
+}
+
+.article-info {
+    padding: 0.5rem;
+    flex: 0.9;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.article-info h2 {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+    margin-bottom: 0.2rem;
+}
+
+.topic-text {
+    display: inline-block;
+    background: var(--card-light);
+    font-size: 0.75rem;
+    align-self: flex-start;
+    color: var(--primary-color);
+    margin-bottom: 0.3rem;
+}
+
+.article-meta {
+    font-size: 0.75rem;
+}
+
+.article-stats {
+    font-size: 0.75rem;
+    margin-top: auto;
+}
+
+.read-more {
+    margin-top: auto;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.read-more:hover {
+    color: var(--primary-hover);
+}
+
+body.dark-theme .article-card {
+    background: var(--card-dark);
+    border-color: var(--border-dark);
+}
+
+body.dark-theme .article-info h2,
+body.dark-theme .article-meta,
+body.dark-theme .article-stats {
+    color: var(--text-dark);
+}
+
+body.dark-theme .topic-text {
+    background: var(--card-dark);
+    color: var(--primary-color);
+}
+
+@media (max-width: 1400px) {
+    .article-card {
+        max-width: 230px;
+        font-size: 0.5rem;
+        padding: 0.3rem;
+    }
+
+    .article-image {
+        max-height: 80px;
+    }
+
+    .article-info {
+        padding: 0.3rem;
+        gap: 0.3rem;
+    }
+
+    .article-info h2 {
+        font-size: 0.5rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .article-meta,
+    .article-stats,
+    .topic-text {
+        font-size: 0.5rem;
+    }
+
+    .article-meta span,
+    .article-meta p,
+    .article-stats span,
+    .article-stats p {
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .article-card {
+        max-width: 210px;
+        padding: 0.2rem;
+    }
+
+    .article-image {
+        max-height: 70px;
+    }
+
+    .article-info {
+        padding: 0.2rem;
+        gap: 0.2rem;
+    }
+
+    .article-info h2 {
+        font-size: 0.5rem;
+    }
+
+    .article-meta,
+    .article-stats,
+    .topic-text {
+        font-size: 0.65rem;
+    }
+
+    .article-meta span,
+    .article-meta p,
+    .article-stats span,
+    .article-stats p {
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .article-card {
+        max-width: 100%;
+        padding: 0.2rem;
+    }
+
+    .article-image {
+        max-height: 60px;
+    }
+
+    .article-info {
+        padding: 0.2rem;
+        gap: 0.2rem;
+        flex: 1;
+    }
+
+    .article-info h2 {
+        font-size: 0.5rem;
+    }
+
+    .article-meta,
+    .article-stats,
+    .topic-text {
+        font-size: 0.4rem;
+    }
+
+    .article-meta span,
+    .article-meta p,
+    .article-stats span,
+    .article-stats p {
+        font-size: 0.4rem;
+    }
 }

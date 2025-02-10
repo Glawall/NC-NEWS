@@ -8,17 +8,21 @@ function Pagination({ totalCount, pageNumber, onPageChange, limit }) {
     <div className="pagination">
       {pageNumber > 1 && (
         <button
-          className="previous-page"
           onClick={() => handlePageChange(pageNumber - 1)}
-          disabled={pageNumber === 1}
+          className="prev-button"
         >
           Previous
         </button>
       )}
+      <div className="pagination-info">
+        <span>
+          Page {pageNumber} of {Math.ceil(totalCount / limit)}
+        </span>
+      </div>
       {pageNumber < totalPages && (
         <button
-          className="next-page"
           onClick={() => handlePageChange(pageNumber + 1)}
+          className="next-button"
         >
           Next
         </button>

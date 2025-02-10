@@ -4,7 +4,7 @@ import { AuthContext } from "../context/auth-context";
 import { useSearchParams } from "react-router-dom";
 import Pagination from "./Pagination";
 import ArticleCard from "./ArticleCard";
-import PostNewArticleForm from "./PostNewArticleForm";
+import "../styling/UserArticles.css";
 
 function UserArticles() {
   const [userArticles, setUserArticles] = useState([]);
@@ -14,15 +14,24 @@ function UserArticles() {
   const [sortByOptions, setSortByOptions] = useState({
     p: 1,
     limit: 1000,
+    sort_by: "created_at",
   });
   const [searchParams, setSearchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
+
+  const handleSortByChange = (event) => {
+    setSortByOptions((existing) => ({
+      ...existing,
+      sort_by: event.target.value,
+    }));
+  };
+
   const fetchUserArticles = async () => {
     const profileArticles = [];
 
     try {
       const { articles } = await sendRequest(
-        `https://glawall-nc-backend-project.onrender.com/api/articles?limit=${sortByOptions.limit}&p=${sortByOptions.p}`
+        `https://glawall-nc-backend-project.onrender.com/api/articles?limit=${sortByOptions.limit}&p=${sortByOptions.p}&sort_by=${sortByOptions.sort_by}`
       );
       if (!isLoading) {
         articles.forEach((article) => {
@@ -70,40 +79,50 @@ function UserArticles() {
   }
 
   return (
-    <section>
-      <PostNewArticleForm
-        setUserArticles={setUserArticles}
-        topicsList={topicsList}
-        fetchTopics={fetchTopics}
-        setTopicsList={setTopicsList}
-        fetchUserArticles={fetchUserArticles}
-      />
-      <div className="article-card-list-wrapper">
-        <ul>
-          {userArticles.length > 0 ? (
-            userArticles.map((article) => {
-              return <ArticleCard key={article.article_id} article={article} />;
-            })
-          ) : (
-            <p></p>
-          )}
-        </ul>
-        <div>
-          <p>Total articles = {totalCount}</p>
+    <div className="articles-container">
+      <div className="sort-group">
+        <div className="sort-controls">
+          <select
+            value={sortByOptions.sort_by}
+            onChange={handleSortByChange}
+            className="sort-select"
+          >
+            <option value="created_at">Most Recent</option>
+            <option value="created_at,asc">Oldest First</option>
+          </select>
         </div>
+        <div className="items-per-page">
+          <label htmlFor="limit-select">Items per page:</label>
+          <select
+            id="limit-select"
+            value={sortByOptions.limit}
+            onChange={handleLimitChange}
+            className="limit-select"
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+          </select>
+        </div>
+      </div>
+      <div className="user-articles-grid">
+        {userArticles.length > 0 ? (
+          userArticles.map((article) => (
+            <ArticleCard key={article.article_id} article={article} />
+          ))
+        ) : (
+          <p className="no-articles">No articles yet</p>
+        )}
+      </div>
+      <div className="pagination-wrapper">
+        <div className="pagination-info"></div>
         <Pagination
           totalCount={totalCount}
+          limit={sortByOptions.limit}
           pageNumber={sortByOptions.p}
           onPageChange={handlePageChange}
-          limit={sortByOptions.limit}
         />
-        <p>Items per page</p>
-        <select value={sortByOptions.limit} onChange={handleLimitChange}>
-          <option value="10">10</option>
-          <option value="25">25</option>
-        </select>
       </div>
-    </section>
+    </div>
   );
 }
 export default UserArticles;

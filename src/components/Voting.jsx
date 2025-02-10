@@ -1,69 +1,79 @@
+import { useState, useContext } from "react";
 import { useHttpClient } from "../hooks/http-hook";
 import { AuthContext } from "../context/auth-context";
-import { useState, useContext } from "react";
+import Confirm from "./Confirm";
 import "../styling/Voting.css";
 
-const Voting = ({ votes, article_id }) => {
-  const [voteCountArticle, setVoteCountArticle] = useState(votes);
-
+function Voting({ votes, id, type, authorName }) {
   const { isLoading, sendRequest } = useHttpClient();
   const { user, addVotedArticles } = useContext(AuthContext);
-  let currentArticleVotes;
+  const [voteCount, setVoteCount] = useState(votes);
+  const [userVote, setUserVote] = useState(0);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingVote, setPendingVote] = useState(null);
 
-  if (user.votedArticle) {
-    currentArticleVotes = user.votedArticle[article_id];
+  if (user.username === authorName) {
+    return null;
   }
 
-  const patchArticleVotes = async (vote) => {
+  const initiateVote = (increment) => {
+    setPendingVote(increment);
+    setShowConfirm(true);
+  };
+
+  const handleVote = async () => {
+    const increment = pendingVote;
+    const previousVote = userVote;
+    setUserVote(increment === userVote ? 0 : increment);
+    const newVoteCount =
+      voteCount + (increment === userVote ? -increment : increment - userVote);
+    setVoteCount(newVoteCount);
+
     try {
-      setVoteCountArticle((existingVotes) => {
-        return existingVotes + vote;
-      });
-      const { article } = await sendRequest(
-        `https://glawall-nc-backend-project.onrender.com/api/articles/${article_id}`,
+      await sendRequest(
+        `https://glawall-nc-backend-project.onrender.com/api/${type}s/${id}`,
         "PATCH",
-        { inc_votes: vote }
+        {
+          inc_votes: increment === userVote ? -increment : increment - userVote,
+        }
       );
-    } catch (err) {
-      setVoteCountArticle((existingVotes) => {
-        return existingVotes - vote;
-      });
+      if (type === "article") {
+        addVotedArticles(id);
+      }
+      setShowConfirm(false);
+    } catch (error) {
       console.log(error);
+      setVoteCount(voteCount);
+      setUserVote(previousVote);
     }
   };
 
-  const handleVoteIncrease = () => {
-    addVotedArticles(article_id, 1);
-    patchArticleVotes(1);
-  };
-
-  const handleVoteDecrease = () => {
-    addVotedArticles(article_id, -1);
-    patchArticleVotes(-1);
-  };
-
   return (
-    <div className="vote-container">
-      <p className="votes">Votes : {voteCountArticle}</p>
-      <br></br>
-      <div className="article-voting-buttons">
-        <button
-          className="increase-button"
-          disabled={voteCountArticle === votes + 1}
-          onClick={handleVoteIncrease}
-        >
-          + Increase Vote
-        </button>{" "}
-        <button
-          className="decrease-button"
-          disabled={voteCountArticle === votes - 1}
-          onClick={handleVoteDecrease}
-        >
-          - Decrease Vote
-        </button>{" "}
-      </div>
+    <div className="voting-container">
+      {showConfirm && (
+        <Confirm
+          message={`Are you sure you want to ${
+            pendingVote === 1 ? "upvote" : "downvote"
+          } this ${type}?`}
+          onConfirm={handleVote}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+      <button
+        className={`vote-button ${userVote === 1 ? "active" : ""}`}
+        onClick={() => initiateVote(1)}
+      >
+        👍
+      </button>
+      <span className="vote-count">{voteCount}</span>
+      <button
+        className={`vote-button ${userVote === -1 ? "active" : ""}`}
+        onClick={() => initiateVote(-1)}
+      >
+        👎
+      </button>
     </div>
   );
-};
+}
 
 export default Voting;
