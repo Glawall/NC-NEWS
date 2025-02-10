@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
+import { Route, Routes, useNavigate, Navigate, Router } from "react-router-dom";
 import { AuthContext } from "./context/auth-context";
 import { useAuth } from "./hooks/userAuth.jsx";
 import { ErrorBoundary } from "react-error-boundary";
@@ -10,54 +10,36 @@ import Article from "./components/Article";
 import Login from "./components/Login";
 import PostNewArticleForm from "./components/PostNewArticleForm";
 import ErrorFallback from "../src/util/ErrorFallback";
+import Homepage from "./components/Homepage";
 
 function App() {
   const navigate = useNavigate();
   const { isLoggedIn, user, login, logout, addVotedArticles } = useAuth();
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, user, login, logout, addVotedArticles }}
-    >
-      <Header />
-      <ErrorBoundary
-        FallbackComponent={ErrorFallback}
-        onReset={() => {
-          navigate("/");
-        }}
+    <Router>
+      <AuthContext.Provider
+        value={{ isLoggedIn, user, login, logout, addVotedArticles }}
       >
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isLoggedIn ? (
-                <Navigate to="/articles" replace />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route path="/articles" element={<ArticlesList />} />
-          <Route path="/articles/:id" element={<Article />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/my-articles"
-            element={
-              isLoggedIn ? <UserArticles /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/post-article"
-            element={
-              isLoggedIn ? (
-                <PostNewArticleForm />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-        </Routes>
-      </ErrorBoundary>
-    </AuthContext.Provider>
+        <div className="app">
+          <Header />
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onReset={() => {
+              navigate("/");
+            }}
+          >
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/articles" element={<ArticlesList />} />
+              <Route path="/articles/:id" element={<Article />} />
+              <Route path="/my-articles" element={<UserArticles />} />
+              <Route path="/post-article" element={<PostNewArticleForm />} />
+            </Routes>
+          </ErrorBoundary>
+        </div>
+      </AuthContext.Provider>
+    </Router>
   );
 }
 

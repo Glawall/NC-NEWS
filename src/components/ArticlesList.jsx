@@ -9,6 +9,7 @@ import "../styling/ArticlesList.css";
 function ArticlesList() {
   const [articlesList, setArticlesList] = useState([]);
   const { isLoading, sendRequest, error } = useHttpClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sortByOptions, setSortByOptions] = useState({
     sort_by: "created_at",
     order: "desc",
@@ -17,7 +18,6 @@ function ArticlesList() {
     topic: "",
   });
   const [topicsList, setTopicsList] = useState([]);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [isSliding, setIsSliding] = useState(false);
