@@ -2,6 +2,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { AuthContext } from "./context/auth-context";
 import { useAuth } from "./hooks/userAuth.jsx";
 import { ErrorBoundary } from "react-error-boundary";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 import Header from "./components/Header";
 import UserArticles from "./components/UserArticles";
@@ -30,10 +31,38 @@ function App() {
           <Routes>
             <Route path="/" element={<Homepage />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/articles" element={<ArticlesList />} />
-            <Route path="/articles/:id" element={<Article />} />
-            <Route path="/my-articles" element={<UserArticles />} />
-            <Route path="/post-article" element={<PostNewArticleForm />} />
+            <Route
+              path="/articles"
+              element={
+                <ProtectedRoute>
+                  <ArticlesList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/articles/:id"
+              element={
+                <ProtectedRoute>
+                  <Article />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-articles"
+              element={
+                <ProtectedRoute>
+                  <UserArticles />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/post-article"
+              element={
+                <ProtectedRoute>
+                  <PostNewArticleForm />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </ErrorBoundary>
       </div>

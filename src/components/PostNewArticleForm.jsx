@@ -60,9 +60,6 @@ function PostNewArticleForm() {
         }
       );
       if (!isLoading) {
-        setTopicsList((existingTopics) => {
-          return [newArticle.topic, ...existingTopics];
-        });
         setArticleInputs({
           author: user.username,
           title: "",
@@ -74,7 +71,7 @@ function PostNewArticleForm() {
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
-          navigate("/my-articles");
+          navigate("/my-articles", { replace: true });
         }, 2000);
       }
     } catch (error) {

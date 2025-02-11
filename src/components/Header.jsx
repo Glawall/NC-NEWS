@@ -7,8 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 function Header() {
   const { isLoggedIn, user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [logo, setLogo] = useState("NC-NEWS/relay.png");
+  const [logo, setLogo] = useState("/relay.png");
 
   useEffect(() => {
     const updateLogo = () => {
@@ -32,7 +31,7 @@ function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    window.location.href = "/";
   };
 
   return (

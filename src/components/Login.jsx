@@ -34,7 +34,7 @@ const Login = () => {
     });
     if (currentUser) {
       login(currentUser);
-      navigate("/articles");
+      window.location.href = "/articles";
     }
   };
 

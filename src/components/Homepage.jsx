@@ -1,25 +1,28 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/auth-context";
+import { useNavigate } from "react-router-dom";
 import Login from "./Login";
-import ArticlesList from "./ArticlesList";
 import "../styling/Homepage.css";
 
 function Homepage() {
   const { isLoggedIn } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  if (isLoggedIn) {
-    return <ArticlesList />;
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/articles");
+    }
+  }, []);
 
   return (
     <div className="homepage">
       <div className="welcome-section">
         <h1>Welcome to Relay - pass it on!</h1>
         <p>
-          Relay News is a web application built using React.js. It provides
-          users with a platform to browse articles, view profiles, and interact
-          with a community. Users can log in to access personalized features
-          such as commenting on articles and voting.
+          Relay is a web application built using React.js. It provides users
+          with a platform to browse articles, view profiles, and interact with a
+          community. Users can log in to access personalized features such as
+          commenting on articles and voting.
         </p>
         <p>
           Please select a mock user to login, and please be aware it may take a
